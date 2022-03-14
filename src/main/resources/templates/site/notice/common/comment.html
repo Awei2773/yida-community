@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<li class="media pb-3 pt-3 mb-3 border-bottom position-relative"
+    th:if="${#maps.containsKey(status.messageVoMap,'comment')}"
+    th:object="${status.messageVoMap.comment}"
+    th:fragment="notice-comment">
+    <span class="badge badge-danger" th:text="*{conservationUnread}">3</span>
+    <img src="http://static.nowcoder.com/images/head/reply.png" class="mr-4 user-header" alt="通知图标">
+    <div class="media-body">
+        <h6 class="mt-0 mb-3">
+            <span>评论</span>
+            <span class="float-right text-muted font-size-12" \
+                  th:text="*{#dates.format(message.createTime,'yyyy-MM-dd HH:mm:ss')}">
+                2019-04-28 14:13:25
+            </span>
+        </h6>
+        <!--评论：用户aaa对你xxx这篇帖子进行了回复: cccc...-->
+        <div th:if="${!status.commentContent.data.isReply}">
+            <a th:text="*{otherOne.username}" th:href="|/user/profile/*{otherOne.id}|">nowcoder</a>
+            <a>
+                 评论了你的<b>帖子</b>
+                <a th:text="|${#strings.substring(status.commentContent.data.postTitile,0
+               ,#strings.length(status.commentContent.data.postTitile)<5?#strings.length(status.commentContent.data.postTitile):5)}...|"
+                   th:href="|/discuss/get/${status.commentContent.data.postId}|"
+                ></a>
+            </a>
+            <ul class="d-inline font-size-12 float-right">
+                <li class="d-inline ml-2"><span class="text-primary">共 <i th:text="*{conservationMsgCount}">3</i> 条会话</span></li>
+            </ul>
+        </div>
+        <!--回复：用户aaa回复了你:...-->
+        <div th:if="${status.commentContent.data.isReply}">
+            <a th:text="*{otherOne.username}" th:href="|/user/profile/*{otherOne.id}|">nowcoder</a>
+            <a>
+                回复了你:
+                <a th:text="|${#strings.substring(status.commentContent.data.content,0
+               ,#strings.length(status.commentContent.data.content)<5?#strings.length(status.commentContent.data.content):5)}...|"
+                   th:href="|/discuss/get/${status.commentContent.data.postId}|"
+                ></a>
+            </a>
+            <a class="d-inline font-size-12 float-right" th:href="@{/notice/notice-detail/comment}">
+                <div class="d-inline ml-2"><span class="text-primary">共 <i th:text="*{conservationMsgCount}">3</i> 条通知</span></div>
+            </a>
+        </div>
+    </div>
+</li>

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.waigo.yida.community.dao.DiscussPostMapper">
+    <sql id="database-id">`discuss_post`</sql>
+    <sql id = "selectFields">
+        ${alias}.`id`, ${alias}.`user_id`, ${alias}.`title`,${alias}.`content`,${alias}.`type`,${alias}.`status`
+        ,${alias}.`create_time`,${alias}.`comment_count`,${alias}.`score`
+    </sql>
+
+    <sql id = "insertFields">
+        `user_id`, `title`, `content`, `type`, `status`, `create_time`, `comment_count`, `score`
+    </sql>
+    <!--分页查询讨论帖信息-->
+    <resultMap id="DiscussPost" type="com.waigo.yida.community.entity.DiscussPost" autoMapping="true">
+        <association property="user" resultMap="User" autoMapping="false"/>
+    </resultMap>
+    <resultMap id="User" type="com.waigo.yida.community.entity.User">
+        <result property="username" column="username"/>
+        <result property="headerUrl" column="header_url"/>
+    </resultMap>
+    <select id="selectDiscussPosts" resultMap="DiscussPost">
+        select
+        <include refid="selectFields"><property name="alias" value="t"/></include>,
+        u.username,u.header_url from
+        (select <include refid="selectFields"><property name="alias" value="discuss_post"/></include>
+        from <include refid="database-id"/>
+        where status != 2
+        <if test="userId!=0">
+            and `user_id` = #{userId}
+        </if>
+        <if test="orderColumns!=null">
+            ORDER BY
+            <foreach collection="orderColumns" separator="," item="orderColumn">
+                ${orderColumn}
+                <if test="orderMode==0">
+                    asc
+                </if>
+                <if test="orderMode==1">
+                    desc
+                </if>
+            </foreach>
+        </if>
+        <if test="limit!=0">
+            limit #{limit} offset #{offset}
+        </if>) t
+        join `user` u on t.user_id = u.id;
+    </select>
+    <select id="selectDiscussPostsByHotOrTime" resultMap="DiscussPost">
+        select
+        <include refid="selectFields"><property name="alias" value="t"/></include>,
+        u.username,u.header_url from
+        (select <include refid="selectFields"><property name="alias" value="discuss_post"/></include>
+        from <include refid="database-id"/>
+        where status != 2
+        <if test="userId!=0">
+            and `user_id` = #{userId}
+        </if>
+        order by
+        <choose>
+            <when test="orderMode==0">
+                `create_time` desc
+            </when>
+            <otherwise>
+                `type` desc,`status` desc,`score` desc
+            </otherwise>
+        </choose>
+        <if test="limit!=0">
+            limit #{limit} offset #{offset}
+        </if>) t
+        join `user` u on t.user_id = u.id;
+    </select>
+    <!--查询讨论贴的个数-->
+    <select id = "selectDiscussPostRows" resultType="int">
+        select count(id)
+        from discuss_post
+        where status != 2
+        <if test = "userId != 0">
+            and user_id = #{userId}
+        </if>
+    </select>
+
+    <!--插入/添加帖子-->
+    <insert id="insertDiscussPost" parameterType="com.waigo.yida.community.entity.DiscussPost"
+            keyProperty="id" useGeneratedKeys="true">
+        insert into discuss_post (<include refid="insertFields"></include>)
+        values(#{userId}, #{title}, #{content}, #{type}, #{status}, #{createTime}, #{commentCount}, #{score})
+    </insert>
+
+    <!--根据 id 查询帖子-->
+    <select id = "selectDiscussPostById" resultType="com.waigo.yida.community.entity.DiscussPost">
+        select <include refid="selectFields"><property name="alias" value="discuss_post"/></include>
+        from discuss_post
+        where id = #{id}
+    </select>
+    <select id="listAll" resultType="com.waigo.yida.community.entity.DiscussPost">
+        select <include refid="selectFields"><property name="alias" value="discuss_post"/></include>
+         from discuss_post where status != 2
+    </select>
+
+    <update id="updateCommentCount">
+        update discuss_post
+        set comment_count = #{commentCount}
+        where id = #{id}
+    </update>
+
+    <!--修改帖子类型：0-普通; 1-置顶;-->
+    <update id="updateType">
+        update discuss_post
+        set type = #{type}
+        where id = #{id}
+    </update>
+
+    <!--修改帖子状态：0-正常; 1-精华; 2-拉黑;-->
+    <update id="updateStatus">
+        update discuss_post
+        set status = #{status}
+        where id = #{id}
+    </update>
+
+    <!--修改帖子分数-->
+    <update id="updateScore">
+        update discuss_post
+        set score = #{score}
+        where id = #{id}
+    </update>
+    <!--增加评论数-->
+    <update id="incrCommmentCountById">
+        UPDATE `discuss_post` SET comment_count = comment_count+#{commentCount} WHERE id = #{id}
+    </update>
+</mapper>

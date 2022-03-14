@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<li class="media pb-3 pt-3 mb-3 border-bottom position-relative"
+    th:if="${#maps.containsKey(status.messageVoMap,'like')}"
+    th:object="${status.messageVoMap.like}"
+    th:fragment="notice-like">
+    <span class="badge badge-danger" th:text="*{conservationUnread}">3</span>
+    <img src="http://static.nowcoder.com/images/head/like.png" class="mr-4 user-header" alt="通知图标">
+    <div class="media-body">
+        <h6 class="mt-0 mb-3">
+            <span>赞</span>
+            <span class="float-right text-muted font-size-12"
+                  th:text="*{#dates.format(message.createTime,'yyyy-MM-dd HH:mm:ss')}"
+            >2019-04-28 14:13:25</span>
+        </h6>
+        <div>
+            <a th:text="*{otherOne.username}" th:href="|/user/profile/*{otherOne.id}|">nowcoder</a>
+            <a th:href="|/discuss/get/${status.likeContent.entityId}|">
+                点赞了你的<b th:text="${status.likeContent.entityType==1?'帖子':'评论'}">帖子</b>
+            </a>
+            <a class="d-inline font-size-12 float-right" th:href="@{/notice/notice-detail/like}">
+                <div class="d-inline ml-2"><span class="text-primary">共
+                    <i th:text="*{conservationMsgCount}">3</i> 条通知</span></div>
+            </a>
+        </div>
+    </div>
+</li>

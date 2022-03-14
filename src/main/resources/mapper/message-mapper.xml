@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.waigo.yida.community.dao.MessageMapper">
+    <sql id="selectFields">
+        id,from_id,to_id,conversation_id,content,status,create_time
+    </sql>
+    <sql id="insertFields">
+        from_id,to_id,conversation_id,content,status,create_time
+    </sql>
+    <!--查出和User有关所有会话的最后一条消息-->
+    <select id="selectAllConservationLastMsg" resultType="com.waigo.yida.community.entity.Message">
+        SELECT
+        <include refid="selectFields"/>
+        FROM `message` WHERE id IN(
+        SELECT MAX(t.id) FROM (
+        SELECT id,conversation_id FROM `message` WHERE from_id = #{userId} AND STATUS != 2
+        UNION
+        SELECT id,conversation_id FROM `message` WHERE to_id = #{userId} AND STATUS != 2 AND from_id != 1
+        ) t GROUP BY conversation_id)
+        order by create_time desc
+        <if test="limit!=0">
+            limit #{limit} offset #{offset}
+        </if>
+        ;
+    </select>
+    <!--查出和user有关的会话数量-->
+    <select id="selectConservationCount" resultType="int">
+        SELECT COUNT(*) FROM
+        (
+          SELECT conversation_id FROM `message` WHERE from_id = #{userId} AND status != 2
+          UNION
+          SELECT conversation_id FROM `message` WHERE to_id = #{userId} AND status != 2 AND from_id != 1
+        ) t
+    </select>
+    <!--查出会话下某种状态的消息数量-->
+    <select id="selectMessageCount" resultType="int">
+        SELECT COUNT(*) FROM `message` WHERE conversation_id = #{conversationId}
+        <choose>
+            <when test="status==-1">
+                AND status != 2
+            </when>
+            <otherwise>
+                and status = #{status}
+            </otherwise>
+        </choose>
+    </select>
+    <!--查出系统通知或者朋友私信中未读的数量-->
+    <select id="selectUnreadLetterCount" resultType="int">
+        SELECT count(*) FROM `message` WHERE to_id = #{userId} AND status = 0
+        <if test="isSys==0">
+            and from_id != 1
+        </if>
+        <if test="isSys==1">
+            and from_id = 1
+        </if>
+    </select>
+    <!--查出某个会话下user未读的消息数量-->
+    <select id="selectConservationUnreadCount" resultType="int">
+        SELECT COUNT(*) FROM `message` WHERE conversation_id = #{conversationId}
+        and status = 0 and to_id = #{userId}
+    </select>
+    <!--查出某个会话的所有消息，按照时间逆序-->
+    <select id="selectConversationPageMsgs" resultType="com.waigo.yida.community.entity.Message">
+        select
+        <include refid="selectFields"/>
+        from `message` where conversation_id = #{conversationId}
+        order by create_time desc
+        <if test="limit!=0">
+            limit #{limit} offset #{offset}
+        </if>
+    </select>
+    <select id="selectNoticeCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM `message` WHERE status = #{status} AND from_id = 1 AND to_id = #{userId};
+    </select>
+    <select id="selectAllNoticeLastMsg" resultType="com.waigo.yida.community.entity.Message">
+        SELECT <include refid="selectFields"/>
+        FROM `message`
+        WHERE id IN(
+	      SELECT MAX(id)
+	      FROM `message`
+	      WHERE from_id = 1 AND to_id = #{userId} AND STATUS != 2 GROUP BY conversation_id
+         )
+    </select>
+    <select id="listTopicAllNotices" resultType="com.waigo.yida.community.entity.Message">
+        SELECT <include refid="selectFields"/>
+        FROM `message`
+        WHERE STATUS != 2 AND from_id = 1 AND to_id = #{userId} AND conversation_id = #{topic};
+    </select>
+    <select id="selectTopicNoticeCountByUserId" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM `message`
+        WHERE STATUS != 2 AND from_id = 1 AND to_id = #{userId} AND conversation_id = #{topic};
+    </select>
+    <!--将某个用户在某个会话下的未读消息改成已读-->
+    <update id="updateUnreadInConversation">
+        update `message` set status = 1 where conversation_id = #{conversationId} and to_id = #{userId} and status != 2;
+    </update>
+    <update id="updateNoticeStatusByTopic">
+        UPDATE `message` SET STATUS = #{status} WHERE from_id = 1 AND to_id = #{userId} AND conversation_id = #{topic};
+    </update>
+    <update id="updateUnreadTopicNotices">
+        UPDATE `message` SET STATUS = 1 WHERE from_id = 1 AND to_id = #{userId} AND conversation_id = #{topic} and status != 2;
+    </update>
+    <!--插入一条消息-->
+    <insert id="insertMessage" keyProperty="id" useGeneratedKeys="true">
+        insert into `message`(
+        <include refid="insertFields"/>
+        )
+        values (#{fromId},#{toId},#{conversationId},#{content},#{status},#{createTime})
+    </insert>
+
+</mapper>
