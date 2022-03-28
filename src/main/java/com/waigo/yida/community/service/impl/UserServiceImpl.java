@@ -12,6 +12,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -22,8 +25,8 @@ import java.util.Map;
  * author waigo
  * create 2021-10-03 13:48
  */
-@Service
-public class UserServiceImpl implements UserService {
+@Service("userService")
+public class UserServiceImpl implements UserService, UserDetailsService {
 
 
     @Autowired
@@ -135,5 +138,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByEmail(String email) {
         return userMapper.selectByEmail(email);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        if(StringUtils.isBlank(username)){
+            throw new UsernameNotFoundException("usernameMsg:用户名不能为空！！！");
+        }
+        User user = getUserByName(username);
+        if (user == null || !user.isAccountNonLocked()) {
+            throw new UsernameNotFoundException("usernameMsg:该用户不存在，或者未激活！！！");
+        }
+        return user;
     }
 }

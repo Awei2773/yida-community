@@ -1,37 +1,28 @@
 package com.waigo.yida.community.controller;
-
 import com.waigo.yida.community.common.Status;
-import com.waigo.yida.community.config.properties.KaptchaProperties;
 import com.waigo.yida.community.constant.AuthConstant;
+import com.waigo.yida.community.constant.PathConstant;
 import com.waigo.yida.community.log.annotation.LogUserOpt;
 import com.waigo.yida.community.log.enums.UserOption;
 import com.waigo.yida.community.service.AuthService;
 import com.waigo.yida.community.service.KaptchaService;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.imageio.ImageIO;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
+import java.util.Enumeration;
 
 /**
  * author waigo
@@ -43,8 +34,12 @@ public class LoginController implements AuthConstant {
     @Qualifier("img-kaptcha")
     KaptchaService kaptchaService;
 
-    @GetMapping("/login")
-    public String getLoginPage() {
+    @GetMapping(PathConstant.LOGIN_PAGE)
+    public String getLoginPage(HttpServletRequest request,Model model) {
+        Enumeration<String> attributeNames = request.getAttributeNames();
+        while(attributeNames.hasMoreElements()){
+            model.addAttribute(request.getAttribute(attributeNames.nextElement()));
+        }
         return "/site/login";
     }
 
@@ -58,6 +53,10 @@ public class LoginController implements AuthConstant {
     @Autowired
     TransactionTemplate transactionTemplate;
 
+    /**
+     * 在集成SpringSecurity之后这个方法已经淘汰了
+     */
+    @Deprecated
     @LogUserOpt(UserOption.LOGIN)
     @PostMapping("/login")
 //    @Transactional(isolation = Isolation.READ_COMMITTED,propagation = Propagation.REQUIRED)

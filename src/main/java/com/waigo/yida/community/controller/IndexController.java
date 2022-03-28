@@ -33,7 +33,7 @@ public class IndexController {
     /** 点赞服务接口*/
     @Autowired
     LikeService likeService;
-    @GetMapping(path={"/","index.html","index"})
+    @GetMapping(path={"/","/index.html","/index"})
     public String getIndexPage(Model model, Page page, HttpServletRequest request){
         int pageAll = discussPostService.selectPageAll(page);
         page.setPageAll(pageAll);
@@ -47,9 +47,5 @@ public class IndexController {
                 ));
         model.addAttribute("curPage",curPage);
         return "index";
-    }
-    @GetMapping(path = {"/test-sse"})
-    public String returnSsePage(){
-        return "/test-sse";
     }
 }

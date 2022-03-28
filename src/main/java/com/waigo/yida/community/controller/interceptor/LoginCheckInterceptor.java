@@ -7,6 +7,8 @@ import com.waigo.yida.community.util.CookieUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -29,15 +31,10 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
                              Object handler) throws Exception {
-        //检查凭证，先抓到ticket,cookie在request中，这里需要自己去拿，springmvc帮不了我们了
-        String ticket = CookieUtil.get(request,"ticket");
-        if(ticket!=null){
-            User user = new User();
-            if(authService.isLogin(ticket,user)){
-                userHolder.setUser(user);
-            }
-            LOGGER.debug("preHandle:{}",handler);
-            //和过滤器一样，返回true才会继续执行下去
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication!=null&&authentication.isAuthenticated()
+                &&authentication.getPrincipal() instanceof User){
+            userHolder.setUser((User) authentication.getPrincipal());
         }
         return true;
     }

@@ -1,18 +1,27 @@
 package com.waigo.yida.community.entity;
 
+import static com.waigo.yida.community.constant.AuthConstant.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 
 /**
  * author waigo
  * create 2021-10-01 19:18
  */
-public class User {
+public class User implements UserDetails {
 
     private int id;
     private String username;
     private String password;
     private String salt;
     private String email;
+    /**
+     * 0-普通用户; 1-超级管理员; 2-版主;
+     */
     private int type;
     private int status;
     private String activationCode;
@@ -34,7 +43,6 @@ public class User {
     public void setUsername(String username) {
         this.username = username;
     }
-
     public String getPassword() {
         return password;
     }
@@ -113,6 +121,59 @@ public class User {
                 ", headerUrl='" + headerUrl + '\'' +
                 ", createTime=" + createTime +
                 '}';
+    }
+    /**
+     * security相关方法
+     */
+    /**
+     * 判断账号是否未过期
+     * @return
+     */
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    /**
+     * 未激活用户就说明是锁定状态
+     * @return
+     */
+    @Override
+    public boolean isAccountNonLocked() {
+        return status == UNLOCKED;
+    }
+
+    /**
+     * 判断密码是否未过期
+     * @return
+     */
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    /**
+     * 账号是否可用
+     * @return
+     */
+    @Override
+    public boolean isEnabled() {
+        return status == UNLOCKED;
+    }
+
+
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        ArrayList<UserAuthority> userAuthorities = new ArrayList<>();
+        if(type == TYPE_ROOT){
+            userAuthorities.add(new UserAuthority(ROLE_ROOT));
+        }
+        if(type == TYPE_MODERATOR){
+            userAuthorities.add(new UserAuthority(ROLE_MODERATOR));
+        }
+        userAuthorities.add(new UserAuthority(ROLE_USER));
+        return userAuthorities;
     }
 
 }

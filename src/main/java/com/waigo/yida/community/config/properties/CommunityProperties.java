@@ -33,10 +33,13 @@ public class CommunityProperties {
     }
 
     public String SERVER_CONTEXT_PATH;
+
     @PostConstruct
-    public void setServerCtxPath(){
-        SERVER_CONTEXT_PATH = protocol + "://" + host+":"+port+"/"+(StringUtils.isBlank(contextPath)?"":contextPath + "/");
+    public void setServerCtxPath() {
+        String contextPathIn = StringUtils.isBlank(contextPath) ? "" : "/" + contextPath;
+        SERVER_CONTEXT_PATH = protocol + "://" + host + ":" + port + contextPathIn;
     }
+
     public String getPort() {
         return port;
     }

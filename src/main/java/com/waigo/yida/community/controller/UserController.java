@@ -98,6 +98,7 @@ public class UserController {
         //3.成功了就修改用户的headerUrl
         User user = userHolder.getUser();
         //host:port/contextPath/files/{fileName}
+
         userService.updateHeaderUrl(user.getId(), communityProperties.SERVER_CONTEXT_PATH + "/user/header/" + fileName);
         //成功就返回
         LOGGER.debug("用户{}，修改头像成功！！！", user.getUsername());
