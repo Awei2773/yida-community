@@ -35,5 +35,12 @@ public interface AuthConstant {
      * 已激活,status = 1
      */
     int UNLOCKED = 1;
-
+    /**
+     * rememberMe cookie
+     */
+    String REMEMBER_ME_COOKIE = "yida_ticket";
+    /**
+     * remember me parameter
+     */
+    String REMEMBER_ME_PARAMETER = "remember-me";
 }

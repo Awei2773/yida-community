@@ -5,10 +5,13 @@ import com.waigo.yida.community.security.handler.LoginFailureHandler;
 import com.waigo.yida.community.security.handler.LoginSuccessHandler;
 import com.waigo.yida.community.security.provider.UserAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 
 /**
  * author waigo
@@ -18,6 +21,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     UserAuthenticationProvider authenticationProvider;
+    @Autowired
+    @Qualifier("userService")
+    UserDetailsService userDetailsService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -38,6 +44,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         USER_GET_HEADER,USER_PASSWORD_FORGET_PAGE,USER_PASSWORD_FORGET_PROCESSING,USER_PROFILE_PAGE,
                         "/**/*.css","/**/*.js","/**/*.jpg","/**/*.jpeg","/**/*.png").permitAll()
                 .anyRequest().authenticated().and()
+            .logout()
+                .invalidateHttpSession(true)
+                .deleteCookies(REMEMBER_ME_COOKIE)
+                .logoutSuccessUrl(INDEX_DEFAULT)
+                .and()
+            .rememberMe()
+                .tokenRepository(new InMemoryTokenRepositoryImpl())
+                .rememberMeCookieName(REMEMBER_ME_COOKIE)
+                .tokenValiditySeconds(REMEMBER_ME_EXPIRE_TIME)
+                .rememberMeParameter(REMEMBER_ME_PARAMETER)
+                .userDetailsService(userDetailsService)
+                .and()
             .csrf()
                 .disable();
     }

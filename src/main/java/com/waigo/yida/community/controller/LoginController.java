@@ -33,7 +33,7 @@ public class LoginController implements AuthConstant {
     @Autowired
     @Qualifier("img-kaptcha")
     KaptchaService kaptchaService;
-
+    //TODO:登录错误消息不能这么处理，request域有很多参数
     @GetMapping(PathConstant.LOGIN_PAGE)
     public String getLoginPage(HttpServletRequest request,Model model) {
         Enumeration<String> attributeNames = request.getAttributeNames();
