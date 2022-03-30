@@ -71,7 +71,7 @@ public class LoginController implements AuthConstant {
         transactionTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
         transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
         Status status = transactionTemplate.execute(transactionStatus -> authService.login(username, password, maxAge));
-
+        //记住我功能-老版实现
         if (status!=null&&status.isSuccess()) {
             //1.设置cookie
             Cookie ticket = new Cookie("ticket", (String) status.get("ticket"));
