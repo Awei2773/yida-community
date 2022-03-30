@@ -1,6 +1,8 @@
 package com.waigo.yida.community.security.config;
 import static com.waigo.yida.community.constant.PathConstant.*;
 import static com.waigo.yida.community.constant.AuthConstant.*;
+
+import com.waigo.yida.community.security.filter.ImgCaptchaAuthenticationFilter;
 import com.waigo.yida.community.security.handler.LoginFailureHandler;
 import com.waigo.yida.community.security.handler.LoginSuccessHandler;
 import com.waigo.yida.community.security.provider.UserAuthenticationProvider;
@@ -11,6 +13,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 
 /**
@@ -22,8 +25,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     UserAuthenticationProvider authenticationProvider;
     @Autowired
+    ImgCaptchaAuthenticationFilter imgCaptchaAuthenticationFilter;
+    @Autowired
     @Qualifier("userService")
     UserDetailsService userDetailsService;
+    @Autowired
+    LoginFailureHandler loginFailureHandler;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -31,7 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginPage(LOGIN_PAGE)
                 .loginProcessingUrl("/login")
                 .successHandler(new LoginSuccessHandler())
-                .failureHandler(new LoginFailureHandler()).and()
+                .failureHandler(loginFailureHandler).and()
             .authorizeRequests()
                 .antMatchers(LOGOUT_PROCESSING,ADD_COMMENT,ADD_DISCUSS_POST,GET_DISCUSS_POST,
                         LIKE_DISCUSS_POST,FOLLOW_SOMEONE,GET_FOLLOWEE,GET_FOLLOWER,UNFOLLOW_SOMEONE,
@@ -56,6 +63,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .rememberMeParameter(REMEMBER_ME_PARAMETER)
                 .userDetailsService(userDetailsService)
                 .and()
+            .addFilterBefore(imgCaptchaAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .csrf()
                 .disable();
     }

@@ -1,4 +1,5 @@
 package com.waigo.yida.community.controller;
+
 import com.waigo.yida.community.common.Status;
 import com.waigo.yida.community.constant.AuthConstant;
 import com.waigo.yida.community.constant.PathConstant;
@@ -6,6 +7,7 @@ import com.waigo.yida.community.log.annotation.LogUserOpt;
 import com.waigo.yida.community.log.enums.UserOption;
 import com.waigo.yida.community.service.AuthService;
 import com.waigo.yida.community.service.KaptchaService;
+import com.waigo.yida.community.util.RedirectAttributes;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.Enumeration;
+import java.util.Map;
 
 /**
  * author waigo
@@ -33,12 +36,16 @@ public class LoginController implements AuthConstant {
     @Autowired
     @Qualifier("img-kaptcha")
     KaptchaService kaptchaService;
-    //TODO:登录错误消息不能这么处理，request域有很多参数
+
     @GetMapping(PathConstant.LOGIN_PAGE)
-    public String getLoginPage(HttpServletRequest request,Model model) {
-        Enumeration<String> attributeNames = request.getAttributeNames();
-        while(attributeNames.hasMoreElements()){
-            model.addAttribute(request.getAttribute(attributeNames.nextElement()));
+    public String getLoginPage(HttpServletRequest request, Model model) {
+        RedirectAttributes redirectAttributes = new RedirectAttributes(request);
+        Map<String, String> flashAttributes = redirectAttributes.getFlashAttributes();
+        if(flashAttributes!=null){
+            Status failure = Status.failure();
+            flashAttributes.forEach(failure::addAttribute);
+            //2.将status进行收集，展示失败信息
+            model.addAttribute("status", failure);
         }
         return "/site/login";
     }
@@ -72,7 +79,7 @@ public class LoginController implements AuthConstant {
         transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
         Status status = transactionTemplate.execute(transactionStatus -> authService.login(username, password, maxAge));
         //记住我功能-老版实现
-        if (status!=null&&status.isSuccess()) {
+        if (status != null && status.isSuccess()) {
             //1.设置cookie
             Cookie ticket = new Cookie("ticket", (String) status.get("ticket"));
             ticket.setMaxAge(maxAge);
@@ -89,7 +96,7 @@ public class LoginController implements AuthConstant {
 
     @GetMapping("/logout")
     public String logout(@CookieValue("ticket") String ticket, Model model) {
-        if (StringUtils.isBlank(ticket) || !authService.isLogin(ticket,null)) {
+        if (StringUtils.isBlank(ticket) || !authService.isLogin(ticket, null)) {
             Status failure = Status.failure();
             failure.addAttribute("jumpText", "还未登录，请先进行登录！！！");
             failure.addAttribute("path", "/login");
