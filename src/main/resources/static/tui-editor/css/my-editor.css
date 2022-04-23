@@ -1,0 +1,7 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+.toastui-editor-contents h1{
+    border-bottom: 1px solid #eaecef;
+}

@@ -1,0 +1,38 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+button.toastui-editor-toolbar-discuss-post,button.toastui-editor-toolbar-discuss-cancel{
+    background: none;
+}
+button.toastui-editor-toolbar-discuss-cancel:hover{
+    background-color: #32ca99 !important;
+    color: #fff !important;
+}
+.nk-container{
+    background-color: #fff;
+}
+.clearfix {
+    zoom: 1;
+    display: block;
+}
+.discuss-line {
+    padding: 0 20px 10px;
+}
+.clearfix:after, .clearfix:before {
+    clear: both;
+    content: ".";
+    display: block;
+    height: 0;
+}
+.topic-publish input {
+    display: inline-block;
+    vertical-align: middle;
+    text-align: left;
+    font: 200 30px/40px "microsoft yahei";
+    height: 40px;
+    overflow: hidden;
+    border: none;
+    white-space: nowrap;
+}
+/*标签板块等设置的Modal页面样式*/
