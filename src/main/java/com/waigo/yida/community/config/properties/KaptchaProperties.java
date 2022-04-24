@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
  * author waigo
  * create 2021-10-03 20:51
  */
-@Configuration
 @ConfigurationProperties(prefix = "security.captcha")
 public class KaptchaProperties {
     private String type;

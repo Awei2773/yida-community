@@ -2,20 +2,17 @@ package com.waigo.yida.community.controller;
 
 import com.waigo.yida.community.annotation.LoginRequired;
 import com.waigo.yida.community.common.*;
+import com.waigo.yida.community.config.properties.MinioProperties;
 import com.waigo.yida.community.constant.CommunityConstant;
 import com.waigo.yida.community.constant.StatusCode;
-import com.waigo.yida.community.entity.Comment;
-import com.waigo.yida.community.entity.DiscussPost;
-import com.waigo.yida.community.entity.Event;
-import com.waigo.yida.community.entity.User;
+import com.waigo.yida.community.entity.*;
 import com.waigo.yida.community.exception.AjaxException;
 import com.waigo.yida.community.log.annotation.LogUserOpt;
 import com.waigo.yida.community.log.enums.UserOption;
-import com.waigo.yida.community.service.CommentService;
-import com.waigo.yida.community.service.DiscussPostService;
-import com.waigo.yida.community.service.LikeService;
-import com.waigo.yida.community.service.UserService;
+import com.waigo.yida.community.service.*;
 import com.waigo.yida.community.service.impl.EventProducer;
+import com.waigo.yida.community.util.MinioBucketUtil;
+import com.waigo.yida.community.util.MinioObjectUtil;
 import com.waigo.yida.community.util.R;
 import com.waigo.yida.community.vo.CommentVo;
 import org.apache.commons.lang3.StringUtils;
@@ -59,6 +56,10 @@ public class DiscussPostController implements CommunityConstant {
     RedisClient redisClient;
     @Autowired
     EventProducer eventProducer;
+    @Autowired
+    MinioService minioService;
+    @Autowired
+    MinioProperties minioProperties;
 
     private static final Logger logger = LoggerFactory.getLogger(DiscussPostController.class);
     @PostMapping("/post")
@@ -174,5 +175,15 @@ public class DiscussPostController implements CommunityConstant {
         return R.create(200,"OK")
                 .addAttribute("isLike",isLike)
                 .addAttribute("likeCount",likeCount).toString();
+    }
+    @GetMapping("/image/uploadPolicy")
+    @ResponseBody
+    public Status getImageUploadPolicy(String imageName){
+        FileUploadResponse fileUploadResponse = minioService.getFileUploadPolicy(minioProperties.getImageBucket(),imageName);
+        if(fileUploadResponse==null){
+            logger.warn("获取预签名上传Url失败！！！");
+            return Status.failure();
+        }
+        return Status.success().lineAddAttribute("info",fileUploadResponse);
     }
 }
