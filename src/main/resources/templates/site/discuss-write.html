@@ -78,8 +78,9 @@
 <script th:src="@{/js/global.js}"></script>
 <script type="text/javascript">
     function showTagModal() {
-        $("#tagModal").css("display","block");
+        $("#tagModal").css("display", "block");
     }
+
     function publish(editor) {
         var content = editor.getMarkdown();
         // var htmlContent = editor.getHTML();
@@ -127,7 +128,7 @@
             height: '640px',
             initialEditType: 'markdown',
             previewStyle: 'vertical',
-            hideModeSwitch:true,
+            hideModeSwitch: true,
             viewer: true,
             plugins: [colorSyntax, codeSyntaxHighlight],
             initialValue: "# 互联网\n" +
@@ -155,6 +156,41 @@
                 backgroundColor: '#32ca99', borderRadius: '8px'
             },
         });
+        editor.removeHook("addImageBlobHook");
+        //file=>图片对象,callback(imageUrl,altText)=>上传成功之后调用设置url和altText
+        editor.addHook("addImageBlobHook", (file, callback) => {
+            console.log("添加图片~~~");
+            const data = {imageName: file.name};
+            //获取预签名url
+            $.ajax({
+                url: CONTEXT_PATH + "/discuss/image/uploadPolicy",
+                data: data,
+                success: data => {
+                    if (data != null && data.code === 200) {
+                        //使用预签名Url上传图片
+                        $.ajax({
+                            type: "put",
+                            url: data.info.preSignUrl, //上传文件的请求路径必须是绝对路劲
+                            data: file, //直接上传文件对象
+                            cache: false,
+                            processData: false, //因为data值是FormData对象，不需要对数据做处理。
+                            contentType: false, //因为是由<form>表单构造的FormData对象，所以这里设置为false。
+                            success:function (response) {
+                                // success 即成功
+                                console.log(response)
+                                callback(data.info.url,file.name);
+                            },
+                            error:function () {
+                                // error 即失败
+                                alert("上传图片失败");
+                            }
+                        })
+                    } else {
+                        alert("获取预签名url失败~~~");
+                    }
+                }
+            });
+        })
         $(".toastui-editor-toolbar-discuss-post").click(_ => {
             publish(editor);
         })

@@ -14,9 +14,10 @@ public class FileUploadResponse {
     private String objectName;
 
     private String preSignUrl;
-    public static FileUploadResponse of(String endPoint, String objectName,String preSignUrl) {
+
+    public static FileUploadResponse of(String endPoint, String bucket, String objectName, String preSignUrl) {
         FileUploadResponse fileUploadResponse = new FileUploadResponse();
-        fileUploadResponse.url = endPoint + objectName;
+        fileUploadResponse.url = endPoint + "/" + bucket + "/" + objectName;
         fileUploadResponse.objectName = objectName;
         fileUploadResponse.preSignUrl = preSignUrl;
         return fileUploadResponse;

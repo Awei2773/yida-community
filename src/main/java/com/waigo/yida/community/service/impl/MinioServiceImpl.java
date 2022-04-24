@@ -39,15 +39,16 @@ public class MinioServiceImpl implements MinioService {
         //fileName -> a.jpg
         int dotIndex = fileName.lastIndexOf(".");
         String suffix = fileName.substring(dotIndex);
-        if (fileName.length() - suffix.length() > MAX_FILE_NAME_LENGTH) {
+        fileName = fileName.substring(0, dotIndex);
+        if (fileName.length() > MAX_FILE_NAME_LENGTH) {
             fileName = fileName.substring(0, MAX_FILE_NAME_LENGTH);
         }
-        fileName = fileName + RandomCodeUtil.getRandomCode(7) + suffix;
+        fileName = fileName + "_" + RandomCodeUtil.getRandomCode(7) + suffix;
         String objName = MinioObjectUtil.getYearMonthFolder() + fileName;
         String presignedObjectUrl = minioObjectUtil.getPresignedObjectUrl(Method.PUT, bucket, objName, null, TimeUnit.MINUTES, 5);
         if (presignedObjectUrl == null) {
             return null;
         }
-        return FileUploadResponse.of(minioProperties.getEndpoint(), objName, presignedObjectUrl);
+        return FileUploadResponse.of(minioProperties.getEndpoint(), bucket,objName, presignedObjectUrl);
     }
 }

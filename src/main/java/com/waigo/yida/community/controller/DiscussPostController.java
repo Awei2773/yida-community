@@ -1,6 +1,5 @@
 package com.waigo.yida.community.controller;
 
-import com.waigo.yida.community.annotation.LoginRequired;
 import com.waigo.yida.community.common.*;
 import com.waigo.yida.community.config.properties.MinioProperties;
 import com.waigo.yida.community.constant.CommunityConstant;
@@ -11,22 +10,17 @@ import com.waigo.yida.community.log.annotation.LogUserOpt;
 import com.waigo.yida.community.log.enums.UserOption;
 import com.waigo.yida.community.service.*;
 import com.waigo.yida.community.service.impl.EventProducer;
-import com.waigo.yida.community.util.MinioBucketUtil;
-import com.waigo.yida.community.util.MinioObjectUtil;
 import com.waigo.yida.community.util.R;
 import com.waigo.yida.community.vo.CommentVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.HtmlUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;

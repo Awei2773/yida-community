@@ -19,14 +19,13 @@ public class MinioBucketUtil {
     MinioClient minioClient;
 
     public boolean bucketExists(String bucket) {
-        boolean found = false;
         try {
-            found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
+            return minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
         } catch (Exception e) {
             e.printStackTrace();
         }
         logger.error("bucketExists执行失败！！！");
-        return found;
+        return false;
     }
 
     public void makeBucket(String bucket) {
