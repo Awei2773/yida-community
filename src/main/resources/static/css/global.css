@@ -4,9 +4,11 @@ html {
 
 body {
 	background: #eee;
-	font-family: arial, STHeiti, 'Microsoft YaHei', \5b8b\4f53;
-	font-size: 14px;
+	font: 14px/1.75 system,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,"PingFang SC","Segoe UI","Microsoft YaHei","wenquanyi micro hei","Hiragino Sans GB","Hiragino Sans GB W3",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans",Arial,sans-serif;
 	height: 100%;
+}
+div.ProseMirror,div.toastui-editor-contents,button.toastui-editor-toolbar-discuss-post,button.toastui-editor-toolbar-discuss-cancel{
+	font-family: BlinkMacSystemFont,"Helvetica Neue",Helvetica,"PingFang SC","Segoe UI","Microsoft YaHei","wenquanyi micro hei","Hiragino Sans GB","Hiragino Sans GB W3",Roboto,Oxygen,Ubuntu,Cantarell,"Fira Sans","Droid Sans",Arial,sans-serif;
 }
 
 html {

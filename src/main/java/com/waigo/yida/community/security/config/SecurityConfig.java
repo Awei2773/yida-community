@@ -40,13 +40,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .successHandler(new LoginSuccessHandler())
                 .failureHandler(loginFailureHandler).and()
             .authorizeRequests()
-                .antMatchers(LOGOUT_PROCESSING,ADD_COMMENT,ADD_DISCUSS_POST,GET_DISCUSS_POST,
+                .antMatchers(LOGOUT_PROCESSING,ADD_COMMENT,ADD_DISCUSS_POST,
                         LIKE_DISCUSS_POST,FOLLOW_SOMEONE,GET_FOLLOWEE,GET_FOLLOWER,UNFOLLOW_SOMEONE,
                         FRIEND_LETTER_PAGE,FRIEND_LETTER_CONVERSATION,POST_FRIEND_LETTER,FRIEND_LETTER_CONVERSATION_MORE_PAGE,
                         GET_NOTICE_PAGE,NOTICE_DETAIL_PAGE,USER_PASSWORD_UPDATE,
-                        USER_SETTING,USER_UPLOAD_HEADER
+                        USER_SETTING,USER_UPLOAD_HEADER,DISCUSS_WRITE_PAGE
                         ).hasAuthority(ROLE_USER)
-                .antMatchers(LOGIN_PAGE,INDEX,INDEX_DEFAULT,INDEX_PAGE,
+                .antMatchers(LOGIN_PAGE,INDEX,INDEX_DEFAULT,INDEX_PAGE,GET_DISCUSS_POST,
                         GET_IMG_CAPTCHA,GET_EMAIL_CAPTCHA,GET_REGISTER_PAGE,REGISTER,PRINCIPAL_ACTIVE,SEARCH,
                         USER_GET_HEADER,USER_PASSWORD_FORGET_PAGE,USER_PASSWORD_FORGET_PROCESSING,USER_PROFILE_PAGE,
                         "/**/*.css","/**/*.js","/**/*.jpg","/**/*.jpeg","/**/*.png").permitAll()

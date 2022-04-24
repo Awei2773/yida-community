@@ -24,6 +24,7 @@ public interface PathConstant {
     String ADD_DISCUSS_POST = "/discuss/post";
     String GET_DISCUSS_POST = "/discuss/get/*";
     String LIKE_DISCUSS_POST = "/discuss/like";
+    String DISCUSS_WRITE_PAGE = "/discuss/write.html";
     /**
      * 关注相关URL
      */
