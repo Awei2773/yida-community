@@ -22,7 +22,7 @@ import java.util.Date;
  * create 2021-10-23 20:59
  */
 @Component
-public class EventConsumer{
+public class EventConsumer {
     @Autowired
     MessageService messageService;
     @Autowired
@@ -32,10 +32,9 @@ public class EventConsumer{
     @Autowired
     DiscussPostService discussPostService;
     private final Logger logger = LoggerFactory.getLogger(EventConsumer.class);
-    @KafkaListener(topics = {CommunityConstant.TOPIC_COMMENT,
-                             CommunityConstant.TOPIC_FOCUS,
-                             CommunityConstant.TOPIC_LIKE})
-    public void handleMessage(ConsumerRecord msg){
+
+    @KafkaListener(topics = {CommunityConstant.TOPIC_COMMENT, CommunityConstant.TOPIC_FOCUS, CommunityConstant.TOPIC_LIKE})
+    public void handleMessage(ConsumerRecord msg) {
         Event event = validateMessage(msg);
         if (event == null) return;
         resolverChain.resolve(event);
@@ -46,18 +45,29 @@ public class EventConsumer{
         message.setToId(event.getUserId());
         message.setContent(JSONObject.toJSONString(event));
         //自己对自己造成的事件不发送
-        if(event.getUserId()!=event.getPostId()){
+        if (event.getUserId() != event.getPostId()) {
             messageService.addMessage(message);
         }
     }
-    @KafkaListener(topics = {
-            CommunityConstant.TOPIC_UPDATE_POST
-    })
-    public void updateESDiscussPost(ConsumerRecord msg){
+
+    @KafkaListener(topics = {CommunityConstant.TOPIC_UPDATE_POST})
+    public void updateESDiscussPost(ConsumerRecord msg) {
         Event event = validateMessage(msg);
         if (event == null) return;
         esDiscussPostService.saveDiscussPost(discussPostService.getDiscussPost(event.getEntityId()));
     }
+
+    /**
+     * 消费删除帖子事件
+     * @param msg
+     */
+    @KafkaListener(topics = {CommunityConstant.TOPIC_DELETE_POST})
+    public void deleteESDiscussPost(ConsumerRecord msg) {
+        Event event = validateMessage(msg);
+        if (event == null) return;
+        esDiscussPostService.deleteDiscussPostById(event.getEntityId());
+    }
+
 
     private Event validateMessage(ConsumerRecord msg) {
         if (msg == null || msg.value() == null) {

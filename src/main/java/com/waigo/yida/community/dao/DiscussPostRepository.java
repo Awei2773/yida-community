@@ -20,7 +20,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DiscussPostRepository extends ElasticsearchRepository<DiscussPost, Integer> {
     /**
-     * 奇怪的bug，查"互联网"能查出来,查"哈哈"查不出来
+     * 奇怪的bug，查"互联网"能查出来,查"哈哈"查不出来 -> 分页从0开始，需要注意
      * @param title
      * @param content
      * @param pageable

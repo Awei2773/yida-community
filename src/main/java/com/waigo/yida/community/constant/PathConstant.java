@@ -25,6 +25,9 @@ public interface PathConstant {
     String GET_DISCUSS_POST = "/discuss/get/*";
     String LIKE_DISCUSS_POST = "/discuss/like";
     String DISCUSS_WRITE_PAGE = "/discuss/write.html";
+    String DISCUSS_TO_DIGEST = "/discuss/*/toDigest";
+    String DISCUSS_DELETE = "/discuss/*";
+    String DISCUSS_STICK = "/discuss/*/changePostType";
     /**
      * 关注相关URL
      */
@@ -69,8 +72,16 @@ public interface PathConstant {
     String USER_PASSWORD_FORGET_PAGE = "/user/forget";
     String USER_PASSWORD_FORGET_PROCESSING = "/user/forget/password";
     String USER_PROFILE_PAGE = "/user/profile/*";
-
-
+    String USER_EDIT_POSTS = "/user/profile/*/my-post.html";
+    String USER_FIRE_REPLYS = "user/profile/*/my-reply.html";
+    /**
+     * 视频相关的URL
+     */
+    String VIDEO_UPLOAD_DETAIL = "/video/upload-detail.html";
+    /**
+     * 错误页面url
+     */
+    String DENIED_PAGE = "/denied";
 
 
 

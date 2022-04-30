@@ -3,9 +3,10 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="icon" href="https://static.nowcoder.com/images/logo_87_87.png"/>
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
-	<link rel="stylesheet" th:href="@{/css/global.css}" />
+	<link rel="icon" th:href="@{/img/icon.png}"/>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+		  crossorigin="anonymous">
+	<link rel="stylesheet" th:href="@{/css/global.css}"/>
 	<title>YIDA社区-关注</title>
 </head>
 <body>
@@ -99,8 +100,9 @@
 				<div class="container-md text-center" th:if="${#lists.size(followers)==0}">
 					<img th:src="@{/img/empty_list.png}" style="width: 400px;"/>
 				</div>
+				<input type="hidden" th:value="${pageMaster.id}" id="userId"/>
 				<!-- 分页 -->
-				<nav class="mt-5" th:if="${page.pageAll>1}" th:fragment="pagination">
+				<nav class="mt-5" th:if="${page.pageAll>1}" th:replace="index::pagination">
 					<ul class="pagination justify-content-center">
 						<li th:class="|page-item ${page.current==1?'disabled':''}|">
 							<a class="page-link"

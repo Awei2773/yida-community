@@ -11,4 +11,5 @@ public interface StatusCode {
     int NOT_FOUND = 404;
     int BAD_REQUEST = 400;
     int NOT_RES_PRESENT = 100;
+    int FORBIDDEN = 403;
 }

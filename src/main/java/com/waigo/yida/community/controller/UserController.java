@@ -1,11 +1,14 @@
 package com.waigo.yida.community.controller;
 
 import com.waigo.yida.community.annotation.LoginRequired;
+import com.waigo.yida.community.common.Page;
 import com.waigo.yida.community.config.properties.CommunityProperties;
 import com.waigo.yida.community.common.Status;
 import com.waigo.yida.community.common.UserHolder;
 import com.waigo.yida.community.constant.CommunityConstant;
 import com.waigo.yida.community.constant.StatusCode;
+import com.waigo.yida.community.entity.Comment;
+import com.waigo.yida.community.entity.DiscussPost;
 import com.waigo.yida.community.entity.User;
 import com.waigo.yida.community.exception.ReqException;
 import com.waigo.yida.community.log.annotation.LogUserOpt;
@@ -13,6 +16,7 @@ import com.waigo.yida.community.log.enums.UserOption;
 import com.waigo.yida.community.service.*;
 import com.waigo.yida.community.util.RandomCodeUtil;
 import com.waigo.yida.community.util.SecurityUtil;
+import com.waigo.yida.community.vo.CommentVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,11 +31,16 @@ import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * author waigo
@@ -39,6 +48,7 @@ import java.io.OutputStream;
  */
 @Controller
 @RequestMapping("/user")
+@SuppressWarnings({"Duplicates"})
 public class UserController {
     @Autowired
     FileUploadService fileUploadService;
@@ -59,6 +69,10 @@ public class UserController {
     FollowService followService;
     @Autowired
     LikeService likeService;
+    @Autowired
+    DiscussPostService discussPostService;
+    @Autowired
+    CommentService commentService;
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     @LoginRequired
@@ -246,6 +260,47 @@ public class UserController {
         model.addAttribute("userLikedCount",userLikedCount);
         model.addAttribute("isFollower",isFollower);
         model.addAttribute("targetUser",user);
+        model.addAttribute("myProfile",true);
         return "/site/profile";
+    }
+    @GetMapping("/profile/{userId}/my-post.html")
+    public String getMyPostPage(@PathVariable("userId") int userId, Model model, Page page, HttpServletRequest request){
+        model.addAttribute("myPost",true);
+        page.setSourceId(userId);
+        int pageAll = discussPostService.selectPageAll(page);
+        page.setPageAll(pageAll);
+        page.setPath(request.getServletPath());
+        page.checkCurrent();
+        page.checkPageFrom();
+        List<DiscussPost> curPage = discussPostService.selectTargetPage(page);
+        curPage.forEach(discussPost ->
+                discussPost.setLikeCount(
+                        likeService.likeCount(CommunityConstant.DISCUSS_POST, discussPost.getId())
+                ));
+        model.addAttribute("curPage",curPage);
+        model.addAttribute("postNum",page.getRows());
+        return "/site/my-post";
+    }
+    @GetMapping("/profile/{userId}/my-reply.html")
+    public String getMyReplyPage(@PathVariable("userId") int userId,Model model,Page page,HttpServletRequest request){
+        model.addAttribute("myReply",true);
+        long rows = commentService.selectCommentRowsByUserId(userId,CommunityConstant.DISCUSS_POST);
+        page.setPageAllByRows(rows);
+        page.setPath(request.getServletPath());
+        page.checkCurrent();
+        page.checkPageFrom();
+        //这里查出来的是评论，也就是说entity_type=1,entity_id就是帖子的id
+        List<Comment> curPageComment = commentService.selectCommentPageByUserId(userId,CommunityConstant.DISCUSS_POST,page);
+        //遍历评论查出所属的帖子对象
+        List<CommentVo> curPage = curPageComment.stream().map(comment->{
+            DiscussPost discussPost = discussPostService.getDiscussPost(comment.getEntityId());
+            CommentVo commentVo = new CommentVo();
+            commentVo.setComment(comment);
+            commentVo.setPost(discussPost);
+            return commentVo;
+        }).collect(Collectors.toList());
+        model.addAttribute("curPage",curPage);
+        model.addAttribute("commentSize",rows);
+        return "/site/my-reply";
     }
 }

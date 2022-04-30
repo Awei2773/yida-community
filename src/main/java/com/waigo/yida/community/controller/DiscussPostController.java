@@ -104,6 +104,12 @@ public class DiscussPostController implements CommunityConstant {
             model.addAttribute("status", failure);
             return "/site/operate-result";//找不到，转去中间页面准备跳转首页，并且记录一下，这里出大问题,可能是攻击
         }
+        if (discussPost.getStatus()==CommunityConstant.POST_DELETED) {
+            logger.error("{}这篇帖子已经删除，用户进行了查询", id);
+            Status failure = Status.failure().lineAddAttribute("jumpText", "这篇帖子已被管理员删除！！！").lineAddAttribute("path", "/index");
+            model.addAttribute("status", failure);
+            return "/site/operate-result";//找不到，转去中间页面准备跳转首页，并且记录一下，这里出大问题,可能是攻击
+        }
         //2.查出这个帖子对应的用户信息
         User user = userService.getUser(discussPost.getUserId());
         //3.查出帖子对应的评论数据
@@ -180,4 +186,40 @@ public class DiscussPostController implements CommunityConstant {
         }
         return Status.success().lineAddAttribute("info",fileUploadResponse);
     }
+    /**
+     * 帖子置顶或取消置顶
+     */
+    @PutMapping("/{id}/changePostType")
+    @ResponseBody
+    public R changePostType(@PathVariable("id")int id,int type){
+        discussPostService.updatePostTypeById(id,type);
+        return R.create(StatusCode.SUCCESS,"操作成功");
+    }
+    /**
+     * 帖子加精、取消加精
+     */
+    @PutMapping("/{id}/toDigest")
+    @ResponseBody
+    public R addToDigest(@PathVariable("id")int id,int status){
+        if(status==CommunityConstant.POST_DELETED){
+            return R.create(StatusCode.BAD_REQUEST,"操作失败，错误的状态");
+        }
+        discussPostService.updatePostStatusById(id,status);
+        return R.create(StatusCode.SUCCESS,"操作成功");
+    }
+    /**
+     * 删除帖子
+     * TODO:后期可以做一个帖子回收站，删除的帖子可以进行恢复
+     */
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    public R deletePost(@PathVariable("id") int id){
+        discussPostService.deletePostById(id);
+        //发送异步请求到消息队列，删除掉es中的这个帖子
+        Event event = new Event();
+        event.setTopic(CommunityConstant.TOPIC_DELETE_POST).setEntityType(CommunityConstant.DISCUSS_POST).setEntityId(id);
+        eventProducer.publishEvent(event);
+        return R.create(StatusCode.SUCCESS,"帖子删除成功");
+    }
+
 }

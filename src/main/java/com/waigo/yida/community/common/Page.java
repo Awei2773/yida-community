@@ -43,6 +43,11 @@ public class Page {
      * 具体如何排序可以按照业务来设置这个值
      */
     private int orderMode;
+
+    /**
+     * 记录条数
+     */
+    private long rows;
     public Page() {
 
     }
@@ -62,13 +67,16 @@ public class Page {
     public void setPageAll(int pageAll) {
         this.pageAll = pageAll;
     }
-    public void setPageAllByRows(long rows){
-        this.pageAll = (int) (rows/pageSize);
-        pageAll+=rows%pageSize==0?0:1;
+
+    public void setPageAllByRows(long rows) {
+        this.pageAll = (int) (rows / pageSize);
+        pageAll += rows % pageSize == 0 ? 0 : 1;
+        this.rows = rows;
     }
 
     /**
      * 当前页
+     *
      * @return
      */
     public int getCurrent() {
@@ -129,6 +137,14 @@ public class Page {
         return Math.min(pageAll, pageFrom + pageHelperSize - 1);
     }
 
+    public long getRows() {
+        return rows;
+    }
+
+    public void setRows(long rows) {
+        this.rows = rows;
+    }
+
     public int calcPageFrom(int pageEnd) {
         pageEnd = Math.max(pageEnd, pageAll);
         return Math.max(1, pageEnd - pageHelperSize + 1);
@@ -160,7 +176,7 @@ public class Page {
      */
     public int getOffset() {
         int i = (current - 1) * pageSize;
-        return Math.max(i,0);
+        return Math.max(i, 0);
     }
 
     public int getSourceId() {

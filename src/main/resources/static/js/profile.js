@@ -1,5 +1,6 @@
 $(function(){
 	$(".follow-btn").click(follow);
+	$(".page-link").click(pageClick);
 });
 var timer = null;
 function follow() {
@@ -27,4 +28,11 @@ function follow() {
 			})
 		}
 	},300);
+}
+function pageClick(e) {
+	var userId = $("#userId").val();
+	let oldHref = $(e.target).attr("href");
+	let href = oldHref+"&userId="+userId;
+	$(e.target).attr("href",href);
+	return true;
 }

@@ -76,10 +76,17 @@ public interface CommunityConstant {
      * 更新帖子数据主题
      */
     String TOPIC_UPDATE_POST = "update_post";
+    /**
+     * 删除帖子主题
+     */
+    String TOPIC_DELETE_POST = "delete_post";
 
     /**
      * 系统用户的ID
      */
     int SYSTEM_USER_ID = 1;
-
+    /**
+     * 帖子删除状态
+     */
+    int POST_DELETED = 2;
 }

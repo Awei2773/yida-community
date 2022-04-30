@@ -20,6 +20,9 @@
         <if test="entityType!=0">
             and `entity_type` = #{entityType}
         </if>
+        <if test="userId!=0">
+            and `user_id` = #{userId}
+        </if>
         order by `create_time` desc
         <if test="limit!=0">
             limit #{limit} offset #{offset}
@@ -39,6 +42,17 @@
         select <include refid="selectFields"/>
         from `comment`
         where id = #{id}
+    </select>
+    <select id="selectCommentRowsByUserId" resultType="java.lang.Integer">
+        select count(*)
+        from `comment`
+        where `status`= 0
+        <if test="userId!=0">
+            and `user_id` = #{userId}
+        </if>
+        <if test="entityType!=0">
+            and `entity_type` = #{entityType}
+        </if>
     </select>
     <!--插入评论-->
     <insert id="insertComment" useGeneratedKeys="true" keyProperty="id">

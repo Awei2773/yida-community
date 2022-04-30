@@ -21,7 +21,7 @@ public class CommentMapperTest {
                                  boolean isAsc, @Param("orderColumns") String... orderColumns);*/
     @Test
     public void testSelectComments(){
-        List<Comment> comments = commentMapper.selectComments(1, 270, 0, 5);
+        List<Comment> comments = commentMapper.selectComments(1, 270,0, 0, 5);
         System.out.println(comments);
     }
     /*int selectCommentRowsByEntityId(int entityId);*/

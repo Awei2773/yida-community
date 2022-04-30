@@ -1,6 +1,7 @@
 package com.waigo.yida.community.service.impl;
 
 import com.waigo.yida.community.common.Page;
+import com.waigo.yida.community.constant.CommunityConstant;
 import com.waigo.yida.community.dao.DiscussPostMapper;
 import com.waigo.yida.community.entity.DiscussPost;
 import com.waigo.yida.community.service.DiscussPostService;
@@ -52,5 +53,20 @@ public class DiscussPostServiceImpl implements DiscussPostService {
     @Override
     public List<DiscussPost> listAll() {
         return discussPostMapper.listAll();
+    }
+
+    @Override
+    public void updatePostTypeById(int id, int type) {
+        discussPostMapper.updateType(id,type);
+    }
+
+    @Override
+    public void updatePostStatusById(int id, int status) {
+        discussPostMapper.updateStatus(id,status);
+    }
+
+    @Override
+    public void deletePostById(int id) {
+        discussPostMapper.updateStatus(id, CommunityConstant.POST_DELETED);
     }
 }

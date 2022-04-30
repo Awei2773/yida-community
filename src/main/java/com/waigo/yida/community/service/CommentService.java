@@ -31,4 +31,15 @@ public interface CommentService {
     Comment getCommentById(int id);
 
     int addComment(Comment comment);
+
+    long selectCommentRowsByUserId(int userId,int entityType);
+
+    /**
+     * 查出某个用户评论或者回复类型的分页数据
+     * @param userId
+     * @param entityType
+     * @param page
+     * @return
+     */
+    List<Comment> selectCommentPageByUserId(int userId, int entityType, Page page);
 }

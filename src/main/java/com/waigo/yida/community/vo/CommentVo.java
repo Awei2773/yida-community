@@ -1,6 +1,7 @@
 package com.waigo.yida.community.vo;
 
 import com.waigo.yida.community.entity.Comment;
+import com.waigo.yida.community.entity.DiscussPost;
 import com.waigo.yida.community.entity.User;
 
 import java.util.List;
@@ -36,6 +37,11 @@ public class CommentVo {
      * likeStatus,当前查看的这个用户针对这个评论是否点过赞
      */
     private int isLike;
+
+    /**
+     * 评论所属的帖子对象
+     */
+    private DiscussPost post;
     public CommentVo() {
     }
 
@@ -107,5 +113,13 @@ public class CommentVo {
 
     public void setIsLike(int isLike) {
         this.isLike = isLike;
+    }
+
+    public DiscussPost getPost() {
+        return post;
+    }
+
+    public void setPost(DiscussPost post) {
+        this.post = post;
     }
 }

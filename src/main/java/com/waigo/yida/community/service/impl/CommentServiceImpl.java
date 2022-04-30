@@ -31,7 +31,7 @@ public class CommentServiceImpl implements CommentService, CommunityConstant {
     public List<Comment> selectComments(int entityType, int entityId, Page page) {
         int offset = page!=null?page.getOffset():0;
         int pageSize = page!=null?page.getPageSize():0;
-        return commentMapper.selectComments(entityType,entityId,offset, pageSize);
+        return commentMapper.selectComments(entityType,entityId,0,offset, pageSize);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class CommentServiceImpl implements CommentService, CommunityConstant {
     @Override
     public List<Comment> selectReplys(int entityType, int targetId, Page page) {
         //回复不用做分页，全部查出来
-        return commentMapper.selectComments(entityType,targetId,0,0);
+        return commentMapper.selectComments(entityType,targetId,0,0,0);
     }
 
     @Override
@@ -70,5 +70,15 @@ public class CommentServiceImpl implements CommentService, CommunityConstant {
              .setEntityId(comment.getId());
         eventProducer.publishEvent(event);
         return rows;
+    }
+
+    @Override
+    public long selectCommentRowsByUserId(int userId,int entityType) {
+        return commentMapper.selectCommentRowsByUserId(userId,entityType);
+    }
+
+    @Override
+    public List<Comment> selectCommentPageByUserId(int userId, int entityType, Page page) {
+        return commentMapper.selectComments(entityType,-1,userId,page.getOffset(),page.getPageSize());
     }
 }

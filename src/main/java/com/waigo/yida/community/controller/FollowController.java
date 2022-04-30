@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -97,14 +98,14 @@ public class FollowController {
      * @return
      */
     @GetMapping(value = "/follower",produces ={MimeTypeUtils.TEXT_HTML_VALUE})
-    public String getUserFollowerPage(Page page, Model model,int userId){
+    public String getUserFollowerPage(Page page, Model model, int userId, HttpServletRequest request){
         //1.page组件初始化
         page.setPageSize(CommunityConstant.FOLLOWER_LIST_PAGE_SIZE);
-        page.setPath("/follow/follower");
-        page.checkCurrent();
-        page.checkPageFrom();
+        page.setPath(request.getServletPath());
         //2.查出总页数
         page.setPageAllByRows(followService.findEntityFollowersCount(CommunityConstant.USER,userId));
+        page.checkCurrent();
+        page.checkPageFrom();
         List<FollowVO> followers = null;
         //3.做页数判断，一页都无就不用查了
         if(page.getPageAll()>0){
@@ -137,14 +138,14 @@ public class FollowController {
      * @return
      */
     @GetMapping(value = "/followee",produces ={MimeTypeUtils.TEXT_HTML_VALUE})
-    public String getFolloweePage(Page page, Model model,int userId){
+    public String getFolloweePage(Page page, Model model,int userId,HttpServletRequest request){
         //1.page组件初始化
         page.setPageSize(CommunityConstant.FOLLOWEE_LIST_PAGE_SIZE);
-        page.setPath("/follow/followee");
-        page.checkCurrent();
-        page.checkPageFrom();
+        page.setPath(request.getServletPath());
         //2.查出总页数
         page.setPageAllByRows(followService.findUserFolloweesCountByType(userId,CommunityConstant.USER));
+        page.checkCurrent();
+        page.checkPageFrom();
         List<FollowVO> followees = null;
         //3.做页数判断，一页都无就不用查了
         if(page.getPageAll()>0){

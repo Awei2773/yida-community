@@ -41,4 +41,10 @@ public interface DiscussPostService {
     int addCommentCount(int id, int commentCount);
 
     List<DiscussPost> listAll();
+
+    void updatePostTypeById(int id, int type);
+
+    void updatePostStatusById(int id, int status);
+
+    void deletePostById(int id);
 }

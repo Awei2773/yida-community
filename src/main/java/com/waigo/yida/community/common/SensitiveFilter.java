@@ -16,7 +16,7 @@ import java.util.*;
  */
 @Component
 public class SensitiveFilter {
-    private static final char REPLACE_CHAR = '*';
+    private static final char REPLACE_CHAR = '?';
     private static final Logger logger = LoggerFactory.getLogger(SensitiveFilter.class);
     private ACAutomation acAutomation;
 
@@ -32,7 +32,7 @@ public class SensitiveFilter {
     /**
      * 1)实现思路：通过AC自动机全文检索到这里的所有敏感词之后，遍历这个Map，从敏感词的结尾位置开始向前遍历，
      * 直到遍历到敏感词的第一个字符为止，全修改成（*：这个可以配置）
-     *
+     * TODO:bugfix->给敏感词替换之后的*前后加上`,防止*号发挥特殊作用
      * @param content
      * @return
      */
@@ -51,15 +51,18 @@ public class SensitiveFilter {
         }
         while (!treeMap.isEmpty()) {
             Map.Entry<Integer, String> sensitiveEntry = treeMap.pollFirstEntry();
+            //i是keyword最后一个字符在contentChars的下标
             int i = sensitiveEntry.getKey();
             if (contentChars[i] == '*') continue;
             String keyword = sensitiveEntry.getValue();
             int s = keyword.length()-1;
-            while(s>=0&&i>=0){//管你隔多远，一定把keyword给找齐了
+            while(s>=0&&i>=0){
+                //管你隔多远，一定把keyword给找齐了
+                //这里主要是避免keyword中间夹杂特殊字符
                 if(contentChars[i]==keyword.charAt(s)){
                     s--;
                 }
-                contentChars[i--] = '*';
+                contentChars[i--] = REPLACE_CHAR;
             }
         }
         return new String(contentChars);

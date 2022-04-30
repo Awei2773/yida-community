@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -21,6 +21,8 @@
     <title>YIDA社区-帖子详情</title>
 </head>
 <body>
+<!--帖子id-->
+<input type="hidden" id="postId" th:value="${status.discussPost.id}"/>
 <div class="nk-container">
     <!-- 头部 -->
     <header class="bg-dark sticky-top" th:replace="index::header">
@@ -83,9 +85,16 @@
                 <img src="http://static.nowcoder.com/images/img/icons/ico-discuss.png"/>
                 <span th:utext="${status!=null&&status.discussPost!=null?status.discussPost.title:''}">备战春招，面试刷题跟他复习，一个月全搞定！</span>
                 <div class="float-right">
-                    <button type="button" class="btn btn-danger btn-sm">置顶</button>
-                    <button type="button" class="btn btn-danger btn-sm">加精</button>
-                    <button type="button" class="btn btn-danger btn-sm">删除</button>
+                    <button type="button"
+                            th:class="|btn ${status.discussPost.type==0?'btn-danger':'btn-secondary'} btn-sm|"
+                            th:text="${status.discussPost.type==0?'置顶':'已置顶'}"
+                            sec:authorize="hasAnyAuthority('MODERATOR')" id="stick">置顶</button>
+                    <button type="button"
+                            th:class="|btn ${status.discussPost.status==0?'btn-danger':'btn-secondary'} btn-sm|"
+                            th:text="${status.discussPost.status==0?'加精':'已加精'}"
+                            sec:authorize="hasAnyAuthority('MODERATOR')" id="digest">加精</button>
+                    <button type="button"
+                            th:if="${status.discussPost.status!=2}" class="btn btn-danger btn-sm" sec:authorize="hasAnyAuthority('ROOT')" id="delete">删除</button>
                 </div>
             </h6>
             <!-- 作者 -->
@@ -369,6 +378,7 @@
 <script th:src="@{/tui-editor/js/toastui-editor-all.js}"></script>
 <script th:src="@{/tui-editor/js/toastui-editor-plugin-code-syntax-highlight-all.min.js}"></script>
 <script th:src="@{/js/global.js}"></script>
+<script th:src="@{/js/discuss.js}"></script>
 <script type="text/javascript">
     var timer = null;
     window.onload = () =>{
@@ -401,9 +411,9 @@
                     $(btn).children("b").text(data.isLike === 0 ? "赞" : "已赞");
                     $(btn).children("i").text(data.likeCount);
                 } else if (data.code === 401) {
-                    window.alert(data.msg);
+                    window.alert(data.message);
                     setTimeout(function () {
-                        window.location.href = CONTEXT_PATH + "/login";
+                        window.location.href = CONTEXT_PATH + "/login.html";
                     }, 500);
                 } else if (data.code === 500) {
                     window.alert("服务器异常！！！")
@@ -411,7 +421,7 @@
                 }catch (e) {
                     window.alert("请先登录才能点赞...");
                     setTimeout(function () {
-                        window.location.href = CONTEXT_PATH + "/login";
+                        window.location.href = CONTEXT_PATH + "/login.html";
                     }, 500);
                 }
             })
