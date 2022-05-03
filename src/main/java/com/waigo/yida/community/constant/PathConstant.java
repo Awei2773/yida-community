@@ -83,6 +83,10 @@ public interface PathConstant {
      */
     String DENIED_PAGE = "/denied";
 
-
-
+    /**
+     * 管理员相关页面
+     */
+    String DATA_PAGE = "/data/data.html";
+    String DATA_CACULATE_UV = "/data/segmentUV";
+    String DATA_CACULATE_DAU = "/data/segmentDAU";
 }

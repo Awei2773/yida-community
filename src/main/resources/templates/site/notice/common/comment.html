@@ -24,9 +24,9 @@
                    th:href="|/discuss/get/${status.commentContent.data.postId}|"
                 ></a>
             </a>
-            <ul class="d-inline font-size-12 float-right">
-                <li class="d-inline ml-2"><span class="text-primary">共 <i th:text="*{conservationMsgCount}">3</i> 条会话</span></li>
-            </ul>
+            <a class="d-inline font-size-12 float-right" th:href="@{/notice/notice-detail/comment}">
+                <div class="d-inline ml-2"><span class="text-primary">共 <i th:text="*{conservationMsgCount}">3</i> 条通知</span></div>
+            </a>
         </div>
         <!--回复：用户aaa回复了你:...-->
         <div th:if="${status.commentContent.data.isReply}">

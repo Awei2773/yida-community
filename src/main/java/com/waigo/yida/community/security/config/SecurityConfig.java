@@ -61,7 +61,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         USER_SETTING,USER_UPLOAD_HEADER,DISCUSS_WRITE_PAGE,VIDEO_UPLOAD_DETAIL
                         ).hasAuthority(ROLE_USER)
                 .antMatchers(DISCUSS_STICK,DISCUSS_TO_DIGEST).hasAuthority(ROLE_MODERATOR)
-                .antMatchers(DISCUSS_DELETE).hasAuthority(ROLE_ROOT)
+                .antMatchers(DISCUSS_DELETE,DATA_PAGE).hasAuthority(ROLE_ROOT)
                 .antMatchers(LOGIN_PAGE,INDEX,INDEX_DEFAULT,INDEX_PAGE,GET_DISCUSS_POST,
                         GET_IMG_CAPTCHA,GET_EMAIL_CAPTCHA,GET_REGISTER_PAGE,REGISTER,PRINCIPAL_ACTIVE,SEARCH,
                         USER_GET_HEADER,USER_PASSWORD_FORGET_PAGE,USER_PASSWORD_FORGET_PROCESSING,USER_PROFILE_PAGE,

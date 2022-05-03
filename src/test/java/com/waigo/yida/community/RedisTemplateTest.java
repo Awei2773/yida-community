@@ -1,5 +1,6 @@
 package com.waigo.yida.community;
 
+import com.waigo.yida.community.common.RedisClient;
 import com.waigo.yida.community.constant.CommunityConstant;
 import com.waigo.yida.community.entity.User;
 import com.waigo.yida.community.service.LikeService;
@@ -10,7 +11,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * author waigo
@@ -20,6 +24,9 @@ import java.util.List;
 public class RedisTemplateTest {
     @Autowired
     StringRedisTemplate redisTemplate;
+    @Autowired
+    RedisClient redisClient;
+
     @Test
     public void stringTest(){
         String key = "user:name";
@@ -72,5 +79,41 @@ public class RedisTemplateTest {
         Object o = redisTemplate.opsForValue().get(userRecvLikesKey);
         Integer s = (Integer) o;
         System.out.println(s);
+    }
+    @Test
+    public void hyperloglogTest(){
+        String dailyUVKey = RedisKeyUtil.getDailyUVKey(new Date());
+        Date lastDayDate = new Date(new Date().getTime() + (1000 * 60 * 60 * 24));
+        String lastUVKey = RedisKeyUtil.getDailyUVKey(lastDayDate);
+        redisTemplate.opsForHyperLogLog().add(dailyUVKey,"127.0.0.6");
+        redisTemplate.opsForHyperLogLog().add(dailyUVKey,"127.0.0.1");
+        redisTemplate.opsForHyperLogLog().add(dailyUVKey,"127.0.0.5");
+        redisTemplate.opsForHyperLogLog().add(dailyUVKey,"127.0.0.2");
+        redisTemplate.opsForHyperLogLog().add(lastUVKey,"127.0.0.1");
+        redisTemplate.opsForHyperLogLog().add(lastUVKey,"127.0.0.1");
+        redisTemplate.opsForHyperLogLog().add(lastUVKey,"127.0.0.4");
+        redisTemplate.opsForHyperLogLog().add(lastUVKey,"127.0.0.3");
+        redisTemplate.opsForHyperLogLog().size(dailyUVKey);
+        String segmentUVkey = RedisKeyUtil.getSegmentUVkey(new Date(), lastDayDate);
+        System.out.println(redisClient.hllUnion(segmentUVkey,dailyUVKey,lastUVKey));
+        System.out.println(0);
+    }
+    @Test
+    public void orAndExpireTest(){
+        Date now = new Date();
+        String dailyUVKey = RedisKeyUtil.getDailyUVKey(now);
+        Date lastDayDate = new Date(new Date().getTime() + (1000 * 60 * 60 * 24));
+       String lastDay = RedisKeyUtil.getDailyUVKey(lastDayDate);
+        redisClient.setBit(dailyUVKey,1,true);
+        redisClient.setBit(dailyUVKey,3,true);
+        redisClient.setBit(dailyUVKey,5,true);
+        redisClient.setBit(lastDay,2,true);
+        redisClient.setBit(lastDay,4,true);
+        redisClient.setBit(lastDay,6,true);
+        String destKey = RedisKeyUtil.getSegmentUVkey(now, lastDayDate);
+        Long orRes = redisClient.bitOprForOr(destKey,dailyUVKey,lastDay);
+        orRes = redisClient.bitCount(destKey);
+        System.out.println(orRes);//6
+        redisClient.setExpire(destKey);//测试过期是否正确
     }
 }
